@@ -29,3 +29,13 @@ def VideoDownloader(url, path, type):
             ydl.download([url])
     except:
         print("Error")
+
+class Window(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.title = "Youtube Downloader"
+        self.top = 100
+        self.left = 100
+        self.width = 600
+        self.height = 400
+        self.InitWindow()
