@@ -2,8 +2,9 @@ from PyQt5.QtWidgets import  QApplication, QPushButton, QLineEdit, QLabel, QFile
 import sys
 import pytube
 
-#a function to download the video as a MP3 or MP4 file, takes the URL, the path and the format as parameters
-def VideoDownloader(url, path, type):
+#Storing the Playlist URLS in this list
+PlayListUrl = []
+def SingleVideoDownloader(url, path, type):
     try:
         if type == "MP3":
             video = pytube.YouTube(url)
@@ -11,9 +12,48 @@ def VideoDownloader(url, path, type):
         elif type == "MP4":
             video = pytube.YouTube(url)
             video.streams.filter(only_video=True).first().download(path)
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Information)
+        msg.setText("Success")
+        msg.setInformativeText("The video has been downloaded successfully")
+        msg.setWindowTitle("Success")
+        msg.exec_()
     except:
-        print("Error")
+        #if an error occurs, a message box will be displayed
+        msg = QMessageBox()
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText("Error")
+        msg.setInformativeText("An error occured while downloading the video")
+        msg.setWindowTitle("Error")
+        msg.exec_()
 
+def PlayListDownloader(url, path, type):
+    #loop through the videos in the playlist and append them to the PlayListUrl list
+    for video in pytube.Playlist(url).video_urls:
+        PlayListUrl.append(video)
+    for video in PlayListUrl:
+        try:
+            if type == "MP3":
+                video = pytube.YouTube(video)
+                video.streams.filter(only_audio=True).first().download(path)
+            elif type == "MP4":
+                video = pytube.YouTube(video)
+                video.streams.filter(only_video=True).first().download(path)
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Information)
+            msg.setText("Success")
+            msg.setInformativeText("The video has been downloaded successfully")
+            msg.setWindowTitle("Success")
+            msg.exec_()
+        except:
+            msg = QMessageBox()
+            msg.setIcon(QMessageBox.Critical)
+            msg.setText("Error")
+            msg.setInformativeText("An error occured while downloading the playlist")
+            msg.setWindowTitle("Error")
+            msg.exec_()
+    #Clear the list after downloading the playlist
+    PlayListUrl.clear()
 class Scene(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -88,9 +128,10 @@ class Scene(QMainWindow):
         if path == "":
             QMessageBox.about(self, "Error", "Please select a path")
         else:
-            #calling the function if the path is provided
-            VideoDownloader(url, path, type)
-            QMessageBox.about(self, "Success", "Downloaded Successfully")
+            if "playlist" in url:
+                PlayListDownloader(url, path, type)
+            else:
+                SingleVideoDownloader(url, path, type)
     def exitevent(self):
         ExitConfirmation = QMessageBox.question(self, 'Exit', "Are you sure you want to exit?", QMessageBox.Yes | QMessageBox.No)
         if ExitConfirmation == QMessageBox.Yes:
