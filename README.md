@@ -4,4 +4,6 @@ I made a simple video downloader using Python, and with the help of the Pytube l
 
 to make the program work you need to install the required libraries, just run the `install.bat` file.
 
-As of now the program only supports the download of a single YouTube video, **Playlists are not supported yet**.
+The Program supports both a Single video download and downloading a whole playlist download at once.
+
+You can execute the python file by opening a CMD and typing `py Downloader.py` OR by executing the file `run.bat`
